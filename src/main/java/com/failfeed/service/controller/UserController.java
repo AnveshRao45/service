@@ -33,6 +33,12 @@ public class UserController {
         return "User " + followerId + " now follows " + targetId;
     }
 
+    @PostMapping("/{followerId}/unfollow/{targetId}")
+    public String unfollow(@PathVariable Long followerId, @PathVariable Long targetId) {
+        userService.unfollowUser(followerId, targetId);
+        return "User " + followerId + " unfollowed " + targetId;
+    }
+
     @GetMapping("/{id}/followers")
     public List<User> getFollowers(@PathVariable Long id) {
         return userService.getFollowers(id);

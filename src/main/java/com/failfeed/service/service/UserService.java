@@ -23,8 +23,18 @@ public class UserService {
     }
 
     public User followUser(Long followerId, Long targetId) {
-        User follower = userRepo.findById(followerId).orElseThrow();
-        User target = userRepo.findById(targetId).orElseThrow();
+        User follower = userRepo.findById(followerId).orElseThrow(() -> new RuntimeException("Follower not found"));
+        User target = userRepo.findById(targetId).orElseThrow(() -> new RuntimeException("Target user not found"));
+
+        // Prevent self-following
+        if (followerId.equals(targetId)) {
+            throw new RuntimeException("Users cannot follow themselves");
+        }
+
+        // Check if already following
+        if (follower.getFollowing().contains(target)) {
+            throw new RuntimeException("User " + followerId + " is already following user " + targetId);
+        }
 
         follower.getFollowing().add(target);
         return userRepo.save(follower);
@@ -36,6 +46,19 @@ public class UserService {
         return userRepo.findAll().stream()
                 .filter(u -> u.getFollowing().contains(target))
                 .collect(Collectors.toList());
+    }
+
+    public User unfollowUser(Long followerId, Long targetId) {
+        User follower = userRepo.findById(followerId).orElseThrow(() -> new RuntimeException("Follower not found"));
+        User target = userRepo.findById(targetId).orElseThrow(() -> new RuntimeException("Target user not found"));
+
+        // Check if the follower is actually following the target
+        if (!follower.getFollowing().contains(target)) {
+            throw new RuntimeException("User " + followerId + " is not following user " + targetId);
+        }
+
+        follower.getFollowing().remove(target);
+        return userRepo.save(follower);
     }
 
     public List<User> getFollowing(Long userId) {
