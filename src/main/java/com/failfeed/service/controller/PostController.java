@@ -9,26 +9,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.failfeed.service.model.Post;
-import com.failfeed.service.service.PostService;
+import com.failfeed.service.dto.PostDto;
+import com.failfeed.service.service.PostServiceInterface;
 
 @RestController
 @RequestMapping("/posts")
 public class PostController {
 
-    private final PostService postService;
+    private final PostServiceInterface postService;
 
-    public PostController(PostService postService) {
+    public PostController(PostServiceInterface postService) {
         this.postService = postService;
     }
 
     @PostMapping("/create")
-    public Post createPost(@RequestParam Long userId, @RequestParam String message) {
+    public PostDto createPost(@RequestParam Long userId, @RequestParam String message) {
         return postService.createPost(userId, message);
     }
 
     @GetMapping("/feed/{userId}")
-    public List<Post> getFeed(@PathVariable Long userId) {
+    public List<PostDto> getFeed(@PathVariable Long userId) {
         return postService.getFeed(userId);
+    }
+
+    @GetMapping
+    public List<PostDto> getAllPosts() {
+        return postService.getAllPosts();
     }
 }

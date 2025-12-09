@@ -1,0 +1,69 @@
+package com.failfeed.service.service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
+import com.failfeed.service.dto.PostDto;
+import com.failfeed.service.exception.UserNotFoundException;
+import com.failfeed.service.model.Post;
+import com.failfeed.service.model.User;
+import com.failfeed.service.repository.PostRepository;
+import com.failfeed.service.repository.UserRepository;
+
+@Service
+public class PostServiceImpl implements PostServiceInterface {
+
+    private final UserRepository userRepo;
+    private final PostRepository postRepo;
+
+    public PostServiceImpl(UserRepository userRepo, PostRepository postRepo) {
+        this.userRepo = userRepo;
+        this.postRepo = postRepo;
+    }
+
+    @Override
+    public PostDto createPost(Long userId, String message) {
+        User user = userRepo.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(userId));
+        Post post = new Post(message, user);
+        Post savedPost = postRepo.save(post);
+        return new PostDto(savedPost);
+    }
+
+    @Override
+    public List<PostDto> getFeed(Long userId) {
+        User user = userRepo.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(userId));
+
+        List<Post> feed = new ArrayList<>();
+
+        // include posts from all users they follow
+        for (User followedUser : user.getFollowing()) {
+            feed.addAll(postRepo.findByUser(followedUser));
+        }
+
+        return feed.stream()
+            .map(PostDto::new)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PostDto> getUserPosts(Long userId) {
+        User user = userRepo.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(userId));
+        
+        return postRepo.findByUser(user).stream()
+            .map(PostDto::new)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PostDto> getAllPosts() {
+        return postRepo.findAll().stream()
+            .map(PostDto::new)
+            .collect(Collectors.toList());
+    }
+}
