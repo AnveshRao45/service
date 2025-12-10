@@ -197,7 +197,7 @@ Useful commands:
 - **Local Tunnel** - Npm package
 Install Local tunnel using npm,
 - `npm install -g localtunnel`.
-- `lt --port 8080(*YOUR-PORT-NAME*) --subdomain myfailfeed 
+- `lt --port 8080(*YOUR-PORT-NAME*) --subdomain myfailfeed `
  For the 2nd command you get the link. A Url that is available across every devices. Enter the link in the browser, it will ask for the password, scroll down and you will get the password in the link, then paste it inside the password section.
 
  **Use this URL as the baseURL in your Frontend application to access the endpoints in this service application**
