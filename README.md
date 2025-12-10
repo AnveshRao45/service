@@ -177,7 +177,7 @@ spring.h2.console.enabled=true
 ## Getting Started for Development
 
 You'll need:
-- Java 25 or newer
+- Java
 - Gradle (wrapper comes with project)
 
 Useful commands:
@@ -192,6 +192,17 @@ Useful commands:
 ./gradlew clean build
 ```
 
+## Hosting This Service application to be used by the devices on other network
+
+- **Local Tunnel** - Npm package
+Install Local tunnel using npm,
+- `npm install -g localtunnel`.
+- `lt --port 8080(*YOUR-PORT-NAME*) --subdomain myfailfeed 
+ For the 2nd command you get the link. A Url that is available across every devices. Enter the link in the browser, it will ask for the password, scroll down and you will get the password in the link, then paste it inside the password section.
+
+ **Use this URL as the baseURL in your Frontend application to access the endpoints in this service application**
+
+
 ## Stack
 
 - **Spring Boot 4.0.0** - The framework
@@ -203,8 +214,6 @@ Useful commands:
 ## Troubleshooting
 
 **Port 8080 busy?**: Change `server.port` in application.properties or kill whatever's using port 8080.
-
-**Wrong Java version?**: Run `java -version`. Need Java 25+.
 
 **Database issues?**: H2 resets when app stops - that's normal. Check `/h2-console` for debugging.
 
