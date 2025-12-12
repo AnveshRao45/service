@@ -7,6 +7,7 @@ public class PostDto {
     private String message;
     private Long userId;
     private String userName;
+    private long likeCount;
 
     public PostDto() {}
 
@@ -17,6 +18,16 @@ public class PostDto {
             this.userId = post.getUser().getId();
             this.userName = post.getUser().getName();
         }
+    }
+
+    public PostDto(Post post, long likeCount) {
+        this.id = post.getId();
+        this.message = post.getMessage();
+        if (post.getUser() != null) {
+            this.userId = post.getUser().getId();
+            this.userName = post.getUser().getName();
+        }
+        this.likeCount = likeCount;
     }
 
     // Getters and setters
@@ -31,4 +42,7 @@ public class PostDto {
 
     public String getUserName() { return userName; }
     public void setUserName(String userName) { this.userName = userName; }
+
+    public long getLikeCount() { return likeCount; }
+    public void setLikeCount(long likeCount) { this.likeCount = likeCount; }
 }
