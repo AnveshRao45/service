@@ -2,6 +2,8 @@ package com.failfeed.service.model;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.List;
+
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -12,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -34,6 +37,19 @@ public class User {
     @JsonIgnore
     private Set<User> following = new HashSet<>();
 
+    // Users who follow this user
+    @ManyToMany
+    @JoinTable(
+        name = "user_followers",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "follower_id")
+    )
+    @JsonIgnore
+    private Set<User> followers = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<Alert> alerts;
+
     public User() {}
 
     public User(String name) {
@@ -47,4 +63,10 @@ public class User {
 
     public Set<User> getFollowing() { return following; }
     public void setFollowing(Set<User> following) { this.following = following; }
+
+    public Set<User> getFollowers() { return followers; }
+    public void setFollowers(Set<User> followers) { this.followers = followers; }
+
+    public List<Alert> getAlerts() { return alerts; }
+    public void setAlerts(List<Alert> alerts) { this.alerts = alerts; }
 }
