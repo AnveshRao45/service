@@ -6,6 +6,7 @@ import com.failfeed.service.dto.PostDto;
 
 public interface PostServiceInterface {
     PostDto createPost(Long userId, String message);
+    PostDto getPostById(Long postId);
     List<PostDto> getFeed(Long userId);
     List<PostDto> getUserPosts(Long userId);
     List<PostDto> getAllPosts();

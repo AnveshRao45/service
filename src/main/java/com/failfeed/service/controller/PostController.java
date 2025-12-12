@@ -27,6 +27,11 @@ public class PostController {
         return postService.createPost(userId, message);
     }
 
+    @GetMapping("/{id}")
+    public PostDto getPostById(@PathVariable Long id) {
+        return postService.getPostById(id);
+    }
+
     @GetMapping("/feed/{userId}")
     public List<PostDto> getFeed(@PathVariable Long userId) {
         return postService.getFeed(userId);

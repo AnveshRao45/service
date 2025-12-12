@@ -34,6 +34,13 @@ public class PostServiceImpl implements PostServiceInterface {
     }
 
     @Override
+    public PostDto getPostById(Long postId) {
+        Post post = postRepo.findById(postId)
+            .orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
+        return new PostDto(post, likeService.getLikeCount(postId));
+    }
+
+    @Override
     public List<PostDto> getFeed(Long userId) {
         User user = userRepo.findById(userId)
             .orElseThrow(() -> new UserNotFoundException(userId));
