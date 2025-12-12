@@ -21,13 +21,10 @@ public class LikeServiceImpl implements LikeServiceInterface {
     private final LikeRepository likeRepo;
     private final UserRepository userRepo;
     private final PostRepository postRepo;
-    private final NotificationServiceInterface notificationService;
-
-    public LikeServiceImpl(LikeRepository likeRepo, UserRepository userRepo, PostRepository postRepo, NotificationServiceInterface notificationService) {
+    public LikeServiceImpl(LikeRepository likeRepo, UserRepository userRepo, PostRepository postRepo) {
         this.likeRepo = likeRepo;
         this.userRepo = userRepo;
         this.postRepo = postRepo;
-        this.notificationService = notificationService;
     }
 
     @Override
@@ -51,10 +48,7 @@ public class LikeServiceImpl implements LikeServiceInterface {
         
         Like like = new Like(user, post);
         Like savedLike = likeRepo.save(like);
-        
-        // Create notification for post owner
-        notificationService.createLikeNotification(post.getUser().getId(), userId, postId);
-        
+                
         return new LikeDto(savedLike);
     }
 
