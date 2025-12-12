@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.failfeed.service.dto.UserDto;
 import com.failfeed.service.service.UserServiceInterface;
+import com.failfeed.service.service.ManageAlertsServiceInterface;
 
 @RestController
 @RequestMapping("/users")
@@ -14,13 +15,18 @@ public class FollowController {
 
     private final UserServiceInterface userService;
 
-    public FollowController(UserServiceInterface userService) {
+    private final ManageAlertsServiceInterface manageAlertsService;
+
+    public FollowController(UserServiceInterface userService, ManageAlertsServiceInterface manageAlertsService) {
         this.userService = userService;
+        this.manageAlertsService = manageAlertsService;
     }
 
     @PostMapping("/{followerId}/follow/{targetId}")
     public UserDto follow(@PathVariable Long followerId, @PathVariable Long targetId) {
-        return userService.followUser(followerId, targetId);
+        UserDto userDto = userService.followUser(followerId, targetId);
+        manageAlertsService.createFollowAlert(followerId, targetId);
+        return userDto;
     }
 
     @PostMapping("/{followerId}/unfollow/{targetId}")

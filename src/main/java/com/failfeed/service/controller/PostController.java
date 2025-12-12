@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.failfeed.service.dto.PostDto;
 import com.failfeed.service.service.PostServiceInterface;
+import com.failfeed.service.service.ManageAlertsServiceInterface;
 
 @RestController
 @RequestMapping("/posts")
@@ -18,13 +19,18 @@ public class PostController {
 
     private final PostServiceInterface postService;
 
-    public PostController(PostServiceInterface postService) {
+    private final ManageAlertsServiceInterface manageAlertsService;
+
+    public PostController(PostServiceInterface postService, ManageAlertsServiceInterface manageAlertsService) {
         this.postService = postService;
+        this.manageAlertsService = manageAlertsService;
     }
 
     @PostMapping("/create")
     public PostDto createPost(@RequestParam Long userId, @RequestParam String message) {
-        return postService.createPost(userId, message);
+        PostDto postDto = postService.createPost(userId, message);
+        manageAlertsService.createPostAlert(userId);
+        return postDto;
     }
 
     @GetMapping("/feed/{userId}")
