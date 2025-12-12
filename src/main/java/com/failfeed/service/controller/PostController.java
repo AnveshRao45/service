@@ -33,6 +33,11 @@ public class PostController {
         return postDto;
     }
 
+    @GetMapping("/{id}")
+    public PostDto getPostById(@PathVariable Long id) {
+        return postService.getPostById(id);
+    }
+
     @GetMapping("/feed/{userId}")
     public List<PostDto> getFeed(@PathVariable Long userId) {
         return postService.getFeed(userId);

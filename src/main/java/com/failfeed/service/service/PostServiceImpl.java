@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.failfeed.service.dto.PostDto;
 import com.failfeed.service.exception.UserNotFoundException;
@@ -18,19 +19,29 @@ public class PostServiceImpl implements PostServiceInterface {
 
     private final UserRepository userRepo;
     private final PostRepository postRepo;
+    private final LikeServiceInterface likeService;
 
-    public PostServiceImpl(UserRepository userRepo, PostRepository postRepo) {
+    public PostServiceImpl(UserRepository userRepo, PostRepository postRepo, LikeServiceInterface likeService) {
         this.userRepo = userRepo;
         this.postRepo = postRepo;
+        this.likeService = likeService;
     }
 
     @Override
+    @Transactional
     public PostDto createPost(Long userId, String message) {
         User user = userRepo.findById(userId)
             .orElseThrow(() -> new UserNotFoundException(userId));
         Post post = new Post(message, user);
         Post savedPost = postRepo.save(post);
         return new PostDto(savedPost);
+    }
+
+    @Override
+    public PostDto getPostById(Long postId) {
+        Post post = postRepo.findById(postId)
+            .orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
+        return new PostDto(post, likeService.getLikeCount(postId));
     }
 
     @Override
@@ -46,7 +57,7 @@ public class PostServiceImpl implements PostServiceInterface {
         }
 
         return feed.stream()
-            .map(PostDto::new)
+            .map(post -> new PostDto(post, likeService.getLikeCount(post.getId())))
             .collect(Collectors.toList());
     }
 
@@ -56,14 +67,14 @@ public class PostServiceImpl implements PostServiceInterface {
             .orElseThrow(() -> new UserNotFoundException(userId));
         
         return postRepo.findByUser(user).stream()
-            .map(PostDto::new)
+            .map(post -> new PostDto(post, likeService.getLikeCount(post.getId())))
             .collect(Collectors.toList());
     }
 
     @Override
     public List<PostDto> getAllPosts() {
         return postRepo.findAll().stream()
-            .map(PostDto::new)
+            .map(post -> new PostDto(post, likeService.getLikeCount(post.getId())))
             .collect(Collectors.toList());
     }
 }

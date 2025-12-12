@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.failfeed.service.dto.UserDto;
 import com.failfeed.service.exception.InvalidFollowOperationException;
@@ -50,6 +51,7 @@ public class UserServiceImpl implements UserServiceInterface {
     }
 
     @Override
+    @Transactional
     public UserDto unfollowUser(Long followerId, Long targetId) {
         User follower = userRepo.findById(followerId)
             .orElseThrow(() -> new UserNotFoundException(followerId));
