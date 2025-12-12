@@ -1,6 +1,14 @@
 # FailFeed Social Media Service
 
-A Spring Boot-based REST API for a social media platform. Users can create accounts, follow each other, and share posts with their followers.
+A Spring Boot-based REST API for a social media platform. Users can create accounts, follow each other, share posts with their followers, like posts, and receive notifications.
+
+## Recent Updates
+
+### Transaction Management Fix (Dec 2025)
+- **Fixed**: Resolved "No EntityManager with actual transaction available" errors
+- **Problem**: Database write operations (create, update, delete) were failing due to missing transaction boundaries
+- **Solution**: Added `@Transactional` annotations to all service methods performing write operations
+- **Impact**: All like/unlike, follow/unfollow, notification, and post creation operations now work reliably
 
 ## Quick Start
 
@@ -8,7 +16,10 @@ A Spring Boot-based REST API for a social media platform. Users can create accou
 - User registration and profile management
 - Follow/unfollow other users
 - Create and view posts
+- Like/unlike posts
 - Get personalized feeds based on who you follow
+- Receive notifications for follows and likes
+- View and manage notifications
 
 ### Running the Service
 ```bash
@@ -23,12 +34,12 @@ The service starts on `http://localhost:8080`
 
 ## API Endpoints
 
-The service has four main areas:
+The service has six main areas:
 
 ### User Management
 ```
 POST   /users/create           # Create a new user
-GET    /users                  # List all users  
+GET    /users                  # List all users
 GET    /users/{id}            # Get specific user
 GET    /users/{id}/followers  # Who's following this user
 GET    /users/{id}/following  # Who this user follows
@@ -46,6 +57,24 @@ POST   /posts/create           # Create a new post
 GET    /posts                 # List all posts
 GET    /posts/feed/{userId}   # Get user's personalized feed
 GET    /users/{id}/posts      # Get posts by specific user
+```
+
+### Likes
+```
+POST   /posts/{postId}/like/{userId}    # Like a post
+DELETE /posts/{postId}/like/{userId}    # Unlike a post
+GET    /posts/{postId}/likes            # Get likes for a post
+GET    /posts/user/{userId}/likes       # Get likes by a user
+```
+
+### Notifications
+```
+GET    /notifications/{userId}          # Get all notifications for user
+GET    /notifications/{userId}/unread   # Get unread notifications
+GET    /notifications/{userId}/unread/count  # Get unread count
+POST   /notifications/{notificationId}/read  # Mark notification as read
+POST   /notifications/{userId}/read-all      # Mark all notifications as read
+DELETE /notifications/{notificationId}       # Delete a notification
 ```
 
 ## Usage Examples
@@ -92,6 +121,42 @@ curl http://localhost:8080/posts
 curl http://localhost:8080/users/2/posts
 ```
 
+### Likes
+```bash
+# Like a post
+curl -X POST "http://localhost:8080/posts/1/like/2"
+
+# Unlike a post
+curl -X DELETE "http://localhost:8080/posts/1/like/2"
+
+# Get likes for a post
+curl http://localhost:8080/posts/1/likes
+
+# Get all likes by a user
+curl http://localhost:8080/posts/user/2/likes
+```
+
+### Notifications
+```bash
+# Get all notifications for a user
+curl http://localhost:8080/notifications/1
+
+# Get unread notifications
+curl http://localhost:8080/notifications/1/unread
+
+# Get unread count
+curl http://localhost:8080/notifications/1/unread/count
+
+# Mark a notification as read
+curl -X POST "http://localhost:8080/notifications/1/read"
+
+# Mark all notifications as read
+curl -X POST "http://localhost:8080/notifications/1/read-all"
+
+# Delete a notification
+curl -X DELETE "http://localhost:8080/notifications/1"
+```
+
 ## How It Works
 
 **Creating Users**: Just send a name, get back a user ID. Simple as that.
@@ -100,14 +165,18 @@ curl http://localhost:8080/users/2/posts
 
 **Posts**: Each post belongs to one user. Feed shows posts from people you follow, combined into one list.
 
+**Likes**: Users can like posts from others, but not their own. Each post tracks who liked it and the total count.
+
+**Notifications**: System automatically creates notifications when someone follows you or likes your posts. You can mark them as read or delete them.
+
 **Feed Generation**: Your feed pulls posts from everyone you're following and displays them together.
 
 ## Error Handling
 
 You'll get standard HTTP status codes back:
 
-- **404 Not Found**: User doesn't exist
-- **400 Bad Request**: Something invalid in your request (like trying to follow yourself)
+- **404 Not Found**: User, post, or notification doesn't exist
+- **400 Bad Request**: Something invalid in your request (like trying to follow yourself, like your own post, or like a post twice)
 - **500 Internal Server Error**: Something went wrong on our end
 
 Errors return JSON like:
@@ -150,6 +219,19 @@ src/main/java/com/failfeed/service/
 - See posts from people you follow
 - View everyone's posts
 - Filter posts by specific users
+
+### Likes
+- Like and unlike posts
+- Prevent liking your own posts
+- No duplicate likes allowed
+- View like counts and who liked posts
+
+### Notifications
+- Automatic notifications for follows and likes
+- Mark notifications as read
+- Mark all notifications as read
+- Delete individual notifications
+- Track unread notification counts
 
 ## Database
 

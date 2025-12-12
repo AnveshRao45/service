@@ -1,0 +1,74 @@
+# Base URL: http://localhost:8080
+# Run these commands step by step to test all features
+
+"=== Creating Users ==="
+POST "http://localhost:8080/users/create?name=Anvesh"
+echo
+POST "http://localhost:8080/users/create?name=Siddhu"  
+echo
+POST "http://localhost:8080/users/create?name=Shakti"
+echo
+
+"=== Checking All Users ==="
+curl "http://localhost:8080/users"
+echo
+
+"=== Follow System (Creates Notifications) ==="
+POST "http://localhost:8080/users/2/follow/1"  # Anvesh follows Siddhu
+echo
+POST "http://localhost:8080/users/3/follow/1"  # Shakti follows Siddhu  
+echo
+
+"=== Siddhu's Followers ==="
+curl "http://localhost:8080/users/1/followers"
+echo
+
+"=== Creating Posts ==="
+POST "http://localhost:8080/posts/create?userId=1&message=Hello from Anvesh! This is my first post."
+echo
+POST "http://localhost:8080/posts/create?userId=2&message=Hi everyone! Siddhu here."
+echo
+
+"=== All Posts (Check for likeCount) ==="
+curl "http://localhost:8080/posts"
+echo
+
+"=== Like System ==="
+POST "http://localhost:8080/posts/1/like/2"     # Anvesh likes Siddhu's post
+echo
+POST "http://localhost:8080/posts/1/like/3"     # Shakti likes Siddhu's post
+echo
+
+"=== Get Likes for Post 1 ==="
+curl "http://localhost:8080/posts/1/likes"
+echo
+
+"=== Anvesh's Feed (Should show Siddhu's liked post) ==="
+curl "http://localhost:8080/posts/feed/2"
+echo
+
+"=== Notification System ==="
+curl "http://localhost:8080/notifications/1"             # Siddhu's notifications
+echo
+curl "http://localhost:8080/notifications/1/unread"      # Siddhu's unread notifications
+echo
+curl "http://localhost:8080/notifications/1/unread/count" # Unread count
+echo
+
+"=== Mark All Notifications as Read ==="
+POST "http://localhost:8080/notifications/1/read-all"
+echo
+
+"=== Check Notifications Again ==="
+curl "http://localhost:8080/notifications/1"
+echo
+
+"=== Unlike Test ==="
+DELETE "http://localhost:8080/posts/1/like/3"   # Shakti unlikes Siddhu's post
+echo
+
+"=== Final Posts Check (likeCount should be 1) ==="
+curl "http://localhost:8080/posts"
+echo
+
+"=== Test Complete! ==="

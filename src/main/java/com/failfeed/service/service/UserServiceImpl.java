@@ -16,9 +16,11 @@ import com.failfeed.service.repository.UserRepository;
 public class UserServiceImpl implements UserServiceInterface {
 
     private final UserRepository userRepo;
+    private final NotificationServiceInterface notificationService;
 
-    public UserServiceImpl(UserRepository userRepo) {
+    public UserServiceImpl(UserRepository userRepo, NotificationServiceInterface notificationService) {
         this.userRepo = userRepo;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -47,6 +49,10 @@ public class UserServiceImpl implements UserServiceInterface {
 
         follower.getFollowing().add(target);
         User savedFollower = userRepo.save(follower);
+        
+        // Create notification for the target user
+        notificationService.createFollowNotification(targetId, followerId);
+        
         return new UserDto(savedFollower);
     }
 
