@@ -8,6 +8,7 @@ public interface ManageAlertsServiceInterface {
     AlertDto createPostAlert(Long userId);
     AlertDto createFollowAlert(Long followerId, Long followedId);
     AlertDto createRetweetAlert(Long retweeterId, Long originalPosterId);
+    AlertDto createLikeAlert(Long likerId, Long postId);
     AlertDto getAlertById(Long alertId);   
     void sendAlertToFollowers(Long alertId, Long userId);
     List<AlertDto> displayAlerts(Long userId);

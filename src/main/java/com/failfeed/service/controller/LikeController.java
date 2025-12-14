@@ -11,20 +11,30 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.failfeed.service.dto.LikeDto;
 import com.failfeed.service.service.LikeServiceInterface;
+import com.failfeed.service.service.ManageAlertsServiceInterface;
 
 @RestController
 @RequestMapping("/posts")
 public class LikeController {
 
     private final LikeServiceInterface likeService;
+    private final ManageAlertsServiceInterface manageAlertsService;
 
-    public LikeController(LikeServiceInterface likeService) {
+    public LikeController(LikeServiceInterface likeService, ManageAlertsServiceInterface manageAlertsService) {
         this.likeService = likeService;
+        this.manageAlertsService = manageAlertsService;
     }
 
     @PostMapping("/{postId}/like/{userId}")
     public LikeDto likePost(@PathVariable Long postId, @PathVariable Long userId) {
-        return likeService.likePost(userId, postId);
+        LikeDto likeDto = likeService.likePost(userId, postId);
+        // Create like alert for the post owner (if not liking own post)
+        try {
+            manageAlertsService.createLikeAlert(userId, postId);
+        } catch (Exception e) {
+            // Ignore if alert creation fails (e.g., user likes own post)
+        }
+        return likeDto;
     }
 
     @DeleteMapping("/{postId}/like/{userId}")

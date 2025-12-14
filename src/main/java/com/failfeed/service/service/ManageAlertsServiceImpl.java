@@ -11,8 +11,10 @@ import com.failfeed.service.exception.UserNotFoundException;
 import com.failfeed.service.exception.AlertNotFoundException;
 import com.failfeed.service.model.Alert;
 import com.failfeed.service.model.User;
+import com.failfeed.service.model.Post;
 import com.failfeed.service.repository.UserRepository;
 import com.failfeed.service.repository.AlertRepository;
+import com.failfeed.service.repository.PostRepository;
 import com.failfeed.service.observer.AlertSubject;
 import com.failfeed.service.observer.FollowerNotificationObserver;
 import com.failfeed.service.observer.LoggingObserver;
@@ -24,11 +26,13 @@ public class ManageAlertsServiceImpl implements ManageAlertsServiceInterface {
 
     private final UserRepository userRepo;
     private final AlertRepository alertRepo;
+    private final PostRepository postRepo;
     private final AlertSubject alertSubject;
 
-    public ManageAlertsServiceImpl(UserRepository userRepository, AlertRepository alertRepository) {
+    public ManageAlertsServiceImpl(UserRepository userRepository, AlertRepository alertRepository, PostRepository postRepository) {
         this.userRepo = userRepository;
         this.alertRepo = alertRepository;
+        this.postRepo = postRepository;
         this.alertSubject = new AlertSubject();
         // Attach default observers
         this.alertSubject.attach(new LoggingObserver());
@@ -95,6 +99,31 @@ public class ManageAlertsServiceImpl implements ManageAlertsServiceInterface {
         alertSubject.notifyObservers(alertDto); 
         sendAlertToFollowers(alert.getId(), originalPosterId);
         return alertDto;    
+    }
+
+    @Override
+    public AlertDto createLikeAlert(Long likerId, Long postId) {
+        User liker = userRepo.findById(likerId)
+            .orElseThrow(() -> new UserNotFoundException(likerId));
+        Post post = postRepo.findById(postId)
+            .orElseThrow(() -> new RuntimeException("Post not found with id: " + postId));
+        User postOwner = post.getUser();
+        
+        // Don't create alert if user likes their own post
+        if (liker.getId().equals(postOwner.getId())) {
+            return null;
+        }
+        
+        String content = liker.getName() + " liked your post";
+        Alert alert = new Alert(content, postOwner);
+        AlertDto alertDto = new AlertDto(alert);
+        alertRepo.save(alert);
+        // Initialize alert state
+        AlertContext alertContext = new AlertContext(alert.getId());
+        alertContext.send();
+        // Notify observers about new alert
+        alertSubject.notifyObservers(alertDto);
+        return alertDto;
     }
 
     @Override
