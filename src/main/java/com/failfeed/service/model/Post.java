@@ -1,10 +1,13 @@
 package com.failfeed.service.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 
 @Entity
 public class Post {
@@ -18,6 +21,8 @@ public class Post {
     @ManyToOne
     private User user;
 
+    private LocalDateTime createdAt;
+
     public Post() {}
 
     public Post(String message, User user) {
@@ -25,7 +30,14 @@ public class Post {
         this.user = user;
     }
 
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
+
     public Long getId() { return id; }
     public String getMessage() { return message; }
     public User getUser() { return user; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

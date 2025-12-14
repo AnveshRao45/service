@@ -3,6 +3,8 @@ package com.failfeed.service.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Comparator;
+
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,6 +62,7 @@ public class PostServiceImpl implements PostServiceInterface {
         }
 
         return feed.stream()
+            .sorted(Comparator.comparing(Post::getCreatedAt).reversed()) // Newest first
             .map(post -> new PostDto(post, likeService.getLikeCount(post.getId())))
             .collect(Collectors.toList());
     }
@@ -70,6 +73,7 @@ public class PostServiceImpl implements PostServiceInterface {
             .orElseThrow(() -> new UserNotFoundException(userId));
         
         return postRepo.findByUser(user).stream()
+            .sorted(Comparator.comparing(Post::getCreatedAt).reversed()) // Newest first
             .map(post -> new PostDto(post, likeService.getLikeCount(post.getId())))
             .collect(Collectors.toList());
     }
@@ -77,6 +81,7 @@ public class PostServiceImpl implements PostServiceInterface {
     @Override
     public List<PostDto> getAllPosts() {
         return postRepo.findAll().stream()
+            .sorted(Comparator.comparing(Post::getCreatedAt).reversed()) // Newest first
             .map(post -> new PostDto(post, likeService.getLikeCount(post.getId())))
             .collect(Collectors.toList());
     }

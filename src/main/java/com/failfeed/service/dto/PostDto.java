@@ -1,5 +1,7 @@
 package com.failfeed.service.dto;
 
+import java.time.LocalDateTime;
+
 import com.failfeed.service.model.Post;
 
 public class PostDto {
@@ -8,12 +10,14 @@ public class PostDto {
     private Long userId;
     private String userName;
     private long likeCount;
+    private LocalDateTime createdAt;
 
     public PostDto() {}
 
     public PostDto(Post post) {
         this.id = post.getId();
         this.message = post.getMessage();
+        this.createdAt = post.getCreatedAt();
         if (post.getUser() != null) {
             this.userId = post.getUser().getId();
             this.userName = post.getUser().getName();
@@ -23,6 +27,7 @@ public class PostDto {
     public PostDto(Post post, long likeCount) {
         this.id = post.getId();
         this.message = post.getMessage();
+        this.createdAt = post.getCreatedAt();
         if (post.getUser() != null) {
             this.userId = post.getUser().getId();
             this.userName = post.getUser().getName();
@@ -45,4 +50,7 @@ public class PostDto {
 
     public long getLikeCount() { return likeCount; }
     public void setLikeCount(long likeCount) { this.likeCount = likeCount; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }
