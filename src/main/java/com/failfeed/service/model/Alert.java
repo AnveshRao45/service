@@ -26,9 +26,9 @@ public class Alert {
 
     public Alert() {}
 
-    public Alert(String content, User user) {
-        this.content = content;
+    public Alert(User user,String content) {
         this.user = user;
+        this.content = content;
         this.createdAt = LocalDateTime.now();
     }
 

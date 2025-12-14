@@ -3,6 +3,7 @@ package com.failfeed.service.model;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.List;
+import java.util.ArrayList;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -48,7 +49,7 @@ public class User {
     private Set<User> followers = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
-    private List<Alert> alerts;
+    private List<Alert> alerts = new ArrayList<>();
 
     public User() {}
 

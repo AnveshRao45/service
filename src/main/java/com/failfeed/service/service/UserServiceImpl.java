@@ -16,9 +16,11 @@ import com.failfeed.service.repository.UserRepository;
 public class UserServiceImpl implements UserServiceInterface {
 
     private final UserRepository userRepo;
+    private final ManageAlertsServiceInterface manageAlertsService;
 
-    public UserServiceImpl(UserRepository userRepo) {
+    public UserServiceImpl(UserRepository userRepo, ManageAlertsServiceInterface manageAlertsService) {
         this.userRepo = userRepo;
+        this.manageAlertsService = manageAlertsService;
     }
 
     @Override
@@ -46,7 +48,10 @@ public class UserServiceImpl implements UserServiceInterface {
         }
 
         follower.getFollowing().add(target);
+        target.getFollowers().add(follower);
         User savedFollower = userRepo.save(follower);
+        User savedTarget = userRepo.save(target);
+        manageAlertsService.createFollowAlert(followerId, targetId);
         return new UserDto(savedFollower);
     }
 
@@ -103,4 +108,5 @@ public class UserServiceImpl implements UserServiceInterface {
             .orElseThrow(() -> new UserNotFoundException(userId));
         return new UserDto(user);
     }
+
 }

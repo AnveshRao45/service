@@ -6,16 +6,16 @@ package com.failfeed.service.state;
  */
 public class AlertContext {
     private AlertState state;
-    private Long alertId;
+    // private Long alertId;
 
-    public AlertContext(Long alertId) {
-        this.alertId = alertId;
+    public AlertContext() {
+        // this.alertId = alertId;
         this.state = new PendingState();  // Initial state
     }
 
     public void setState(AlertState state) {
         this.state = state;
-        System.out.println("Alert " + alertId + " transitioned to " + state.getStateName() + " state");
+        System.out.println("Alert state transitioned to " + state.getStateName() + " state");
     }
 
     public AlertState getState() {
@@ -38,9 +38,5 @@ public class AlertContext {
         if (state.getStateName().equals("SENT")) {
             setState(new DeliveredState());
         }
-    }
-
-    public Long getAlertId() {
-        return alertId;
     }
 }

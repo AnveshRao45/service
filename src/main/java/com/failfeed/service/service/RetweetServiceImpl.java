@@ -6,18 +6,14 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.failfeed.service.dto.RetweetDto;
-import com.failfeed.service.dto.AlertDto;
-import com.failfeed.service.exception.UserNotFoundException;
 import com.failfeed.service.exception.AlertNotFoundException;
+import com.failfeed.service.exception.UserNotFoundException;
+import com.failfeed.service.model.Post;
 import com.failfeed.service.model.Retweet;
 import com.failfeed.service.model.User;
-import com.failfeed.service.model.Post;
-import com.failfeed.service.repository.UserRepository;
 import com.failfeed.service.repository.PostRepository;
 import com.failfeed.service.repository.RetweetRepository;
-import com.failfeed.service.observer.AlertSubject;
-import com.failfeed.service.observer.LoggingObserver;
-import com.failfeed.service.state.AlertContext;
+import com.failfeed.service.repository.UserRepository;
 
 @Service
 public class RetweetServiceImpl implements RetweetServiceInterface {
@@ -25,16 +21,14 @@ public class RetweetServiceImpl implements RetweetServiceInterface {
     private final UserRepository userRepo;
     private final PostRepository postRepo;
     private final RetweetRepository retweetRepo;
-    private final AlertSubject alertSubject;
+    private final ManageAlertsServiceInterface manageAlertsService;
 
     public RetweetServiceImpl(UserRepository userRepo, PostRepository postRepo, 
-                            RetweetRepository retweetRepo) {
+                            RetweetRepository retweetRepo, ManageAlertsServiceInterface manageAlertsService) {
         this.userRepo = userRepo;
         this.postRepo = postRepo;
         this.retweetRepo = retweetRepo;
-        this.alertSubject = new AlertSubject();
-        // Attach default observers
-        this.alertSubject.attach(new LoggingObserver());
+        this.manageAlertsService = manageAlertsService;
     }
 
     @Override
@@ -51,22 +45,7 @@ public class RetweetServiceImpl implements RetweetServiceInterface {
 
         Retweet retweet = new Retweet(user, post);
         Retweet savedRetweet = retweetRepo.save(retweet);
-
-        // Initialize alert state
-        AlertContext alertContext = new AlertContext(savedRetweet.getId());
-        alertContext.send();
-
-        // Create retweet alert and notify observers
-        String alertContent = user.getName() + " retweeted " + post.getUser().getName() + "'s post";
-        AlertDto alertDto = new AlertDto(
-            savedRetweet.getId(),
-            alertContent,
-            userId,
-            user.getName(),
-            savedRetweet.getRetweetedAt()
-        );
-        alertSubject.notifyObservers(alertDto);
-
+        manageAlertsService.createRetweetAlert(userId, post.getUser().getId());
         return new RetweetDto(savedRetweet);
     }
 

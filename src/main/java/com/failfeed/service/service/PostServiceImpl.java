@@ -20,11 +20,13 @@ public class PostServiceImpl implements PostServiceInterface {
     private final UserRepository userRepo;
     private final PostRepository postRepo;
     private final LikeServiceInterface likeService;
+    private final ManageAlertsServiceInterface manageAlertsService;
 
-    public PostServiceImpl(UserRepository userRepo, PostRepository postRepo, LikeServiceInterface likeService) {
+    public PostServiceImpl(UserRepository userRepo, PostRepository postRepo, LikeServiceInterface likeService, ManageAlertsServiceInterface manageAlertsService) {
         this.userRepo = userRepo;
         this.postRepo = postRepo;
         this.likeService = likeService;
+        this.manageAlertsService = manageAlertsService;
     }
 
     @Override
@@ -34,6 +36,7 @@ public class PostServiceImpl implements PostServiceInterface {
             .orElseThrow(() -> new UserNotFoundException(userId));
         Post post = new Post(message, user);
         Post savedPost = postRepo.save(post);
+        manageAlertsService.createPostAlert(userId);
         return new PostDto(savedPost);
     }
 

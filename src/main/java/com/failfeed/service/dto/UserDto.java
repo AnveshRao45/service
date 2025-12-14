@@ -28,6 +28,11 @@ public class UserDto {
                 .map(User::getId)
                 .collect(Collectors.toList());
         }
+        if (user.getAlerts() != null) {
+            this.alerts = user.getAlerts().stream()
+                .map(AlertDto::new)
+                .collect(Collectors.toList());
+        }
     }
 
     // Getters and setters

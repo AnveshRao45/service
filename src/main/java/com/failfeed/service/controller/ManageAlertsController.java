@@ -25,16 +25,16 @@ public class ManageAlertsController {
     }
     
     // @PostMapping("/createAlert/{userId}")
-    public AlertDto createPostAlert(@PathVariable Long userId) {
-        return manageAlertsService.createPostAlert(userId);
+    public void createPostAlert(@PathVariable Long userId) {
+        manageAlertsService.createPostAlert(userId);
     }
 
-    public AlertDto createFollowAlert(@PathVariable Long followerId, @PathVariable Long followedId) {
-        return manageAlertsService.createFollowAlert(followerId, followedId);
+    public void createFollowAlert(@PathVariable Long followerId, @PathVariable Long followedId) {
+        manageAlertsService.createFollowAlert(followerId, followedId);
     }
 
-    public AlertDto createRetweetAlert(@PathVariable Long retweeterId, @PathVariable Long originalPosterId) {
-        return manageAlertsService.createRetweetAlert(retweeterId, originalPosterId);
+    public void createRetweetAlert(@PathVariable Long retweeterId, @PathVariable Long originalPosterId) {
+        manageAlertsService.createRetweetAlert(retweeterId, originalPosterId);
     }
     
     @GetMapping("/getAlertById/{alertId}")
