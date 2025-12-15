@@ -31,7 +31,8 @@ public class ManageAlertsServiceImpl implements ManageAlertsServiceInterface {
         this.alertRepo = alertRepository;
         this.alertSubject = new AlertSubject(this.alertRepo);
     }
-        @Override
+
+    @Override
     public void createFollowAlert(Long followerId, Long followedId) {
         User follower = userRepo.findById(followerId)
             .orElseThrow(() -> new UserNotFoundException(followerId));
@@ -50,12 +51,13 @@ public class ManageAlertsServiceImpl implements ManageAlertsServiceInterface {
         alertSubject.detach(notificationObserver);
         alertContext.deliver();
     }
+
     @Override
     public void  createPostAlert(Long userId) {
 
         User user = userRepo.findById(userId)
             .orElseThrow(() -> new UserNotFoundException(userId));
-        String alertContent = user.getName() + " has tweeted !";
+        String alertContent = user.getName() + " has posted a Badge!";
         List<UserDto> followers = user.getFollowers().stream()
                                     .map(UserDto::new)
                                 .collect(Collectors.toList());
@@ -80,15 +82,13 @@ public class ManageAlertsServiceImpl implements ManageAlertsServiceInterface {
 
     }
 
-
-
     @Override
     public void createRetweetAlert(Long retweeterId, Long originalPosterId) {
         User retweeter = userRepo.findById(retweeterId)
             .orElseThrow(() -> new UserNotFoundException(retweeterId));
         User originalPoster = userRepo.findById(originalPosterId)
             .orElseThrow(() -> new UserNotFoundException(originalPosterId));
-        String alertContent = retweeter.getName() + " retweeted " + originalPoster.getName() + "'s post";
+        String alertContent = retweeter.getName() + " rebadged " + originalPoster.getName() + "'s badge";
         List<NotificationObserver> notificationObservers = new ArrayList<>();
         notificationObservers.add(new NotificationObserver(originalPoster));
         List<UserDto> retweeterFollowers = retweeter.getFollowers().stream()
@@ -115,6 +115,27 @@ public class ManageAlertsServiceImpl implements ManageAlertsServiceInterface {
         
         
     }
+    
+    @Override
+    public void createLikeAlert(Long userId, Long originalPosterId) {
+        User user = userRepo.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException(userId));
+        User originalPoster = userRepo.findById(originalPosterId)
+            .orElseThrow(() -> new UserNotFoundException(originalPosterId));
+
+        //Initialize alert state
+        AlertContext alertContext = new AlertContext();
+        alertContext.send();
+        //create and attach notification observer
+        NotificationObserver notificationObserver = new NotificationObserver(originalPoster);
+        alertSubject.attach(notificationObserver);
+        //send notification/alerts to the observers
+        String alertContent = user.getName() + " liked " + originalPoster.getName() + "'s badge";
+        alertSubject.notifyObservers(alertContent);
+        alertSubject.detach(notificationObserver);
+        alertContext.deliver();
+    }
+    
 
     @Override
     public AlertDto getAlertById(Long alertId) {
@@ -124,34 +145,6 @@ public class ManageAlertsServiceImpl implements ManageAlertsServiceInterface {
         return new AlertDto(alert);
     }
 
-    @Override
-    public void sendAlertToFollowers(Long alertId, Long userId) {
-        // // User user = userRepo.findById(userId)
-        // //     .orElseThrow(() -> new UserNotFoundException(userId));
-        // // List<UserDto> followers = user.getFollowers().stream()
-        // //     .map(UserDto::new)
-        // //     .collect(Collectors.toList());
-        // // Alert alert = alertRepo.findById(alertId)
-        // //     .orElseThrow(() -> new AlertNotFoundException(alertId));
-        
-        // // followers.forEach(followerDto -> {
-        // //     User follower = userRepo.findById(followerDto.getId())
-        // //         .orElseThrow(() -> new UserNotFoundException(followerDto.getId())); 
-        // //     NotificationObserver followerObserver = new NotificationObserver(follower);
-        // //     alertSubject.attach(followerObserver);
-            
-        // //     // Simulate sending alert
-        // //     System.out.println("Sending alert to follower: " + follower.getName());
-            
-            
-        // //     // Notify the follower observer
-        // //     alertSubject.notifyObservers(alert);
-        // //     userRepo.save(follower); // Persist the alert addition
-            
-        // //     // Detach after notification (optional)
-        // //     alertSubject.detach(followerObserver);
-        // });
-    }
     @Override
     public List<AlertDto> displayAlerts(Long userId) {
         User user = userRepo.findById(userId)

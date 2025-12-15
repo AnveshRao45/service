@@ -46,3 +46,6 @@ GET http://localhost:8080/retweets/post/2
 GET http://localhost:8080/retweets/count/2
 DELETE http://localhost:8080/retweets/undo?userId=1&postId=1
 GET http://localhost:8080/retweets/check?userId=2&postId=2
+
+
+POST http://localhost:8080/posts/1/like/2

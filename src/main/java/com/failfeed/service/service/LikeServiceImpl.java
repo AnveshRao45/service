@@ -21,10 +21,14 @@ public class LikeServiceImpl implements LikeServiceInterface {
     private final LikeRepository likeRepo;
     private final UserRepository userRepo;
     private final PostRepository postRepo;
-    public LikeServiceImpl(LikeRepository likeRepo, UserRepository userRepo, PostRepository postRepo) {
+    private final ManageAlertsServiceInterface manageAlertsService;
+
+    public LikeServiceImpl(LikeRepository likeRepo, UserRepository userRepo, PostRepository postRepo
+        , ManageAlertsServiceInterface manageAlertsService) {
         this.likeRepo = likeRepo;
         this.userRepo = userRepo;
         this.postRepo = postRepo;
+        this.manageAlertsService = manageAlertsService;
     }
 
     @Override
@@ -48,7 +52,7 @@ public class LikeServiceImpl implements LikeServiceInterface {
         
         Like like = new Like(user, post);
         Like savedLike = likeRepo.save(like);
-                
+        manageAlertsService.createLikeAlert(userId, post.getUser().getId());
         return new LikeDto(savedLike);
     }
 

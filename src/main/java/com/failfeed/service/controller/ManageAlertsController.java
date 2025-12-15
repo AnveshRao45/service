@@ -36,16 +36,16 @@ public class ManageAlertsController {
     public void createRetweetAlert(@PathVariable Long retweeterId, @PathVariable Long originalPosterId) {
         manageAlertsService.createRetweetAlert(retweeterId, originalPosterId);
     }
+
+    public void createLikeAlert(@PathVariable Long userId, @PathVariable Long originalPosterId) {
+        manageAlertsService.createRetweetAlert(userId, originalPosterId);
+    }
     
     @GetMapping("/getAlertById/{alertId}")
     public AlertDto getAlertById(@PathVariable Long alertId) {
         return manageAlertsService.getAlertById(alertId);
     }
 
-    // @PostMapping("/sendAlertToFollowers/{alertId}/{userId}")
-    public void sendAlertToFollowers(@PathVariable Long alertId, @PathVariable Long userId) {
-        manageAlertsService.sendAlertToFollowers(alertId, userId);
-    }
     @GetMapping("/displayAlerts/{userId}")
     public List<AlertDto> displayAlerts(@PathVariable Long userId) {
         return manageAlertsService.displayAlerts(userId);
